@@ -9,7 +9,7 @@
     mc:Ignorable="d"
     NavigationCacheMode="Required">
 
-    <Grid Background="Transparent" Padding="10, 42, 10, 10">
+    <Grid Background="Transparent" Padding="10, 10, 10, 10">
 
         <TextBlock Name="PageTitle" HorizontalAlignment="Left" Margin="10,7,0,0" 
                    Text="Devices" TextWrapping="Wrap" VerticalAlignment="Top" 

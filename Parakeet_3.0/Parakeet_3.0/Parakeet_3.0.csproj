@@ -154,6 +154,8 @@
     <Content Include="Assets\LargeTile.scale-150.png" />
     <Content Include="Assets\LargeTile.scale-200.png" />
     <Content Include="Assets\LargeTile.scale-400.png" />
+    <Content Include="Assets\only_parakeet_icon.png" />
+    <Content Include="Assets\only_parakeet.png" />
     <Content Include="Assets\parakeet.scale-100.png" />
     <Content Include="Assets\parakeet.scale-125.png" />
     <Content Include="Assets\parakeet.scale-150.png" />

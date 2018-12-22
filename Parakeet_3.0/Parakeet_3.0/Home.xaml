@@ -10,7 +10,7 @@
     NavigationCacheMode="Required"
     Background="Transparent">
 
-    <Grid Background="Transparent" Padding="10, 42, 10, 10">
+    <Grid Background="Transparent" Padding="10, 10, 10, 10">
         
         <!-- log list -->
         <ListView Name="LogListView" ItemsSource="{x:Bind logList, Mode=TwoWay}" 

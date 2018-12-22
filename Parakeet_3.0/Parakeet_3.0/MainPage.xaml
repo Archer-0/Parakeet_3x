@@ -15,6 +15,7 @@
         <NavigationView x:Name="MainContent"
                         AlwaysShowHeader="False"
                         IsSettingsVisible="True"
+                        Margin="0, 32, 0, 0"
                         CompactModeThresholdWidth="640"
                         ExpandedModeThresholdWidth="1100"
                         SelectionChanged="MainContent_SelectionChanged" 
@@ -56,31 +57,21 @@
         </NavigationView>
 
         <Grid x:Name="AppTitleBar" 
-              Background="#33000000"
+              Background="#10000000"
               VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="LeftPaddingColumn" Width="0"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <!--<Rectangle x:Name="BackButtonBackground"
-                       Grid.Column="0"
-                       Grid.ColumnSpan="2"
-                       Visibility="Collapsed">
-                <Rectangle.Fill>
-                    <LinearGradientBrush EndPoint="1,1"
-                                         StartPoint="0,0">
-                        <GradientStop Color="#4CBDBDBD"/>
-                        <GradientStop Color="Transparent" Offset="0.2"/>
-                    </LinearGradientBrush>
-                </Rectangle.Fill>
-            </Rectangle>-->
-
             <!-- app title -->
             <StackPanel Orientation="Horizontal" Grid.Column="1">
-                <FontIcon FontFamily="Segoe MDL2 Assets" FontSize="15" 
+                <!--<FontIcon FontFamily="Segoe MDL2 Assets" FontSize="15" 
                           VerticalAlignment="Center"
-                          FontWeight="Light" Glyph="&#xE95E;" Margin="10, 0, 0, 0"/>
+                          FontWeight="Light" Glyph="&#xE95E;" Margin="10, 0, 0, 0"/>-->
+
+                <Image Source="Assets\only_parakeet_icon.png" Height="35"
+                       VerticalAlignment="Center" Margin="00, 0, 0, 0"/>
 
                 <TextBlock Text="{x:Bind appmodel:Package.Current.DisplayName}"
                            Style="{StaticResource CaptionTextBlockStyle}"

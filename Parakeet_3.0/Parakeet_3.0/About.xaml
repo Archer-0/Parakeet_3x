@@ -7,32 +7,37 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="Transparent" Padding="10, 42, 10, 10">
+    <Grid Background="Transparent" Padding="10, 10, 10, 10">
+        
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" 
                     Background="#10000000" Padding="10" MaxWidth="500">
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Image Source="Assets/Square44x44Logo.scale-200.png" VerticalAlignment="Center"/>
+            <StackPanel BorderThickness="0,0,0,.5" BorderBrush="#CC567E55" 
+                        Orientation="Horizontal" HorizontalAlignment="Center"
+                        Padding="0, 0">
+                
+                <Image Source="Assets/only_parakeet.png" Height="65" VerticalAlignment="Center"/>
 
-                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                <StackPanel Margin="10, 0, 0, 0" Orientation="Vertical" VerticalAlignment="Center">
 
-                    <TextBlock Text="Version: 3.0.007" Style="{StaticResource CaptionTextBlockStyle}"
-                       HorizontalAlignment="Right"/>
+                    <TextBlock Name="AppVersionText" Text="Version: 3.6.996" Style="{StaticResource CaptionTextBlockStyle}"
+                       HorizontalAlignment="Right" FontWeight="Light"/>
 
                     <TextBlock Text="Welcome to Parakeet 3.0" 
                                Style="{ThemeResource SubheaderTextBlockStyle}" FontWeight="Light"
                                VerticalAlignment="Center"/>
 
                 </StackPanel>
+                
             </StackPanel>
 
-            <TextBlock TextWrapping="WrapWholeWords" Padding="30, 10, 30, 5">
+            <TextBlock TextWrapping="WrapWholeWords" Padding="30, 10, 30, 5" FontWeight="ExtraLight">
                 <Span xml:space="default">
                     The Parakeet project is a open source software, born togheter with a graduation thesys project.
                     <LineBreak/>
                     <LineBreak/>A huge thank to
                     <Hyperlink NavigateUri="https://github.com/AL3X1">AL3X1</Hyperlink> is a must for the useful
-                    <Hyperlink NavigateUri="https://github.com/AL3X1/Mi-Band-2-SDK">Mi Band 2 SDK</Hyperlink>, used for the connection managment with the Mi Band 2.
+                    <Hyperlink NavigateUri="https://github.com/AL3X1/Mi-Band-2-SDK">Mi Band 2 SDK</Hyperlink>.
                     <LineBreak/>
                     <LineBreak/>Check the source code of Parakeet on <Hyperlink NavigateUri="http://www.github.com/" Foreground="Cyan">GitHub</Hyperlink>.
                 </Span>
