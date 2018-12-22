@@ -1,0 +1,135 @@
+﻿<Page
+    x:Class="Parakeet_3._0.Home"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Parakeet_3._0"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:data="using:Parakeet_3._0.Models"  
+    mc:Ignorable="d"
+    NavigationCacheMode="Required"
+    Background="Transparent">
+
+    <Grid Background="Transparent" Padding="10, 42, 10, 10">
+        
+        <!-- log list -->
+        <ListView Name="LogListView" ItemsSource="{x:Bind logList, Mode=TwoWay}" 
+                  Margin="10,10,250,10" 
+                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                  VerticalAlignment="Stretch"
+                  Padding="0"
+                  Background="#10000000" RightTapped="ShowFlyOutMenu" 
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                  ScrollViewer.HorizontalScrollMode="Auto">
+
+            <!-- flyout menu on right click -->
+            <MenuFlyout x:Name="FlyoutMenu">
+                <MenuFlyoutItem Text="Save logs to file" Name="SaveLogFlyItem" Icon="Save" Click="SaveLogFlyItem_Click"/>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Clear all" Name="ClearLogFlyItem" Icon="Clear" Click="ClearLogFlyItem_Click"/>
+            </MenuFlyout>
+
+            <!-- list style settings -->
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Template">
+                        <!-- only to stop hilighting items on hover -->
+                        <!-- thanks to https://blog.jonstodle.com/uwp-listview-without-highlighting-and-stuff/ -->
+                        <Setter.Value>
+                            <ControlTemplate>
+                                <ContentPresenter/>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListView.ItemContainerStyle>
+
+            <!-- template of items in the list -->
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="data:AppLog" x:Name="LogTemplate">
+                    
+                    <StackPanel Name="ItemRoot" Orientation="Horizontal" Height="auto"
+                                Margin="0, 5, 0, 0" HorizontalAlignment="Stretch">
+                                <!--ToolTipService.ToolTip="{x:Bind LogText}"--> 
+
+                        <FontIcon Name="logItemIcon" Margin="10" FontFamily="Segoe MDL2 Assets" 
+                                  FontSize="25" Glyph="{x:Bind GlyphIcon}" VerticalAlignment="Top"
+                                  FontWeight="ExtraLight" Foreground="{x:Bind IconColor}" 
+                                  ToolTipService.ToolTip="{x:Bind LogCategoryText}"/>
+
+                        <StackPanel Margin="0, 1, 0, 0" HorizontalAlignment="Stretch">
+                            <!-- main log text -->
+                            <TextBlock Name="logItemText" TextWrapping="WrapWholeWords" 
+                                       TextTrimming="CharacterEllipsis" Text="{x:Bind LogText}" IsTextSelectionEnabled="True"/>
+
+                            <StackPanel Orientation="Horizontal">
+                                <!-- log category text -->
+                                <!--<TextBlock Name="logItemCategory" Style="{ThemeResource CaptionTextBlockStyle}"
+                                           Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                           Text="{x:Bind LogCategoryText}"  Margin="0,0,10,0"/>-->
+                                <!-- log timestamp -->
+                                <TextBlock Name="logItemTime" Style="{ThemeResource CaptionTextBlockStyle}"
+                                           Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                           Text="{x:Bind TimeStamp.ToString()}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        
+        <!-- Control Panel -->
+        <StackPanel Orientation="Vertical" Margin="0,10,10,50"  
+                    VerticalAlignment="Stretch" HorizontalAlignment="Right"
+                    Padding="0">
+
+            <!-- shows the selected device -->
+            <TextBlock Name="ConnectStatusText"  Text="Device Connected: None" 
+                       TextWrapping="Wrap" Width="220" Height="auto" MaxHeight="150" FontStyle="Normal" 
+                       FontWeight="ExtraLight" FontSize="24"/>
+
+            <!-- Connection button -->
+            <Button Name="ConnectButton" Content="Connect to device" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
+                    Height="auto" Click="ConnectButton_Click"
+                    Margin="0, 10, 0, 0" ToolTipService.ToolTip="Click to connect to selected device"/>
+            
+            <HyperlinkButton Name="DevicesPageLink" HorizontalAlignment="Right" VerticalAlignment="Center" 
+                             Click="DevicesPageHyperlinkButton_Click" Content="TextContent"
+                             ToolTipService.ToolTip="Choose a device to connect"/>
+            
+            <StackPanel Margin="0, 30, 10, 0" Padding="0, 10" Orientation="Horizontal" 
+                        VerticalAlignment="Stretch" Visibility="Collapsed">
+                
+                <FontIcon FontFamily="Segoe MDL2 Assets" FontSize="25" 
+                          VerticalAlignment="Center" FontWeight="Light" 
+                          Glyph="&#xE95E;" Margin="10, 0, 20, 0"/>
+                
+                <TextBlock Name="CurrentBPMText" Text="--" FontWeight="Normal" FontSize="20"
+                           FontFamily="OCR A Std" TextLineBounds="TrimToBaseline"
+                           VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </StackPanel>
+
+            <StackPanel Name="MiBand2DebugMenu" Orientation="Vertical" Margin="0, 30, 0, 0" 
+                        BorderBrush="MediumPurple" BorderThickness=".5"
+                        Padding="5, 0, 5, 5" Visibility="Collapsed">
+                
+                <TextBlock Text="Debug_menu(MI Band 2)" Foreground="MediumPurple"/>
+
+                <StackPanel Orientation="Vertical" Margin="0">
+                    
+                    <Button Name="GetHRMeasurementMiBandButton" Margin="0, 5, 0, 0" 
+                            Content="Get BMP" Click="GetHRMeasurementMiBandButton_Click"/>
+                    <Button Name="DisconnectMiBandButton" Margin="0, 5, 0, 0" 
+                            Content="Disconnect From miBand" Click="DisconnectMiBandButton_Click"/>
+                </StackPanel>
+            
+            </StackPanel>
+        </StackPanel>
+
+        <Button Name="ResetButton" Content="Reset Parakeet" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
+                    Height="auto" Click="ResetButton_Click"
+                    Margin="0, 0, 10, 10" ToolTipService.ToolTip="Click to reset in case of problems"/>
+
+    </Grid>
+</Page>

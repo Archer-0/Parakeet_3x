@@ -1,0 +1,92 @@
+﻿<Page
+    x:Class="Parakeet_3._0.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Parakeet_3._0"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:appmodel="using:Windows.ApplicationModel"
+    mc:Ignorable="d">
+
+    <Grid ScrollViewer.HorizontalScrollBarVisibility="Auto"
+          Background="{ThemeResource SystemControlChromeLowAcrylicWindowBrush}">
+
+        <!--Main navigation container -->
+        <NavigationView x:Name="MainContent"
+                        AlwaysShowHeader="False"
+                        IsSettingsVisible="True"
+                        CompactModeThresholdWidth="640"
+                        ExpandedModeThresholdWidth="1100"
+                        SelectionChanged="MainContent_SelectionChanged" 
+                        IsPaneOpen="false">
+
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="Home" Tag="home"
+                                    ToolTipService.ToolTip="Home">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE10F;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem Content="Devices" Tag="devices"
+                                    ToolTipService.ToolTip="Devices">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE703;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItemSeparator/>
+
+                <NavigationViewItem Content="About" Tag="about"
+                                    ToolTipService.ToolTip="About">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE946;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+            </NavigationView.MenuItems>
+
+            <Frame x:Name="ContentFrame">
+                <Frame.ContentTransitions>
+                    <TransitionCollection>
+                        <NavigationThemeTransition/>
+                    </TransitionCollection>
+                </Frame.ContentTransitions>
+            </Frame>
+        </NavigationView>
+
+        <Grid x:Name="AppTitleBar" 
+              Background="#33000000"
+              VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="LeftPaddingColumn" Width="0"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <!--<Rectangle x:Name="BackButtonBackground"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="2"
+                       Visibility="Collapsed">
+                <Rectangle.Fill>
+                    <LinearGradientBrush EndPoint="1,1"
+                                         StartPoint="0,0">
+                        <GradientStop Color="#4CBDBDBD"/>
+                        <GradientStop Color="Transparent" Offset="0.2"/>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>-->
+
+            <!-- app title -->
+            <StackPanel Orientation="Horizontal" Grid.Column="1">
+                <FontIcon FontFamily="Segoe MDL2 Assets" FontSize="15" 
+                          VerticalAlignment="Center"
+                          FontWeight="Light" Glyph="&#xE95E;" Margin="10, 0, 0, 0"/>
+
+                <TextBlock Text="{x:Bind appmodel:Package.Current.DisplayName}"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           VerticalAlignment="Center"
+                           Margin="10,0,0,0"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

@@ -1,0 +1,71 @@
+﻿<Page
+    x:Class="Parakeet_3._0.Devices"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Parakeet_3._0"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:data="using:Parakeet_3._0.Models"
+    mc:Ignorable="d"
+    NavigationCacheMode="Required">
+
+    <Grid Background="Transparent" Padding="10, 42, 10, 10">
+
+        <TextBlock Name="PageTitle" HorizontalAlignment="Left" Margin="10,7,0,0" 
+                   Text="Devices" TextWrapping="Wrap" VerticalAlignment="Top" 
+                   Height="auto" Width="200" FontSize="24" TextAlignment="Start"/>
+        
+        <GridView Name="DevicesGridView"
+                  ItemsSource="{x:Bind BTDevices, Mode=OneWay}" 
+                  Background="#10000000" 
+                  SelectedIndex="-1"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch"
+                  Margin="10, 50, 10, 50"
+                  RightTapped="DevicesGridView_RightTapped">
+
+            <MenuFlyout x:Name="FlyoutMenu">
+                <MenuFlyoutItem Text="Refresh" AccessKey="R" Icon="Refresh" 
+                                Click="RefreshItem_Click">
+                </MenuFlyoutItem>
+            </MenuFlyout>
+
+            <GridView.ItemTemplate>
+                <DataTemplate x:DataType="data:BTDevice" x:Name="DeviceDataTemplate">
+                    <StackPanel Width="264" Height="auto" Padding="10" 
+                                Orientation="Horizontal" AutomationProperties.Name="{x:Bind DeviceInfo.Name}"
+                                Tapped="StackPanel_Tapped" ToolTipService.ToolTip="Click to choose this device for connection">
+
+                        <!-- Use &#xE702; for bluetooth symbol or &#xE703; for device symbol-->
+                        <FontIcon Margin="0,5,0,0" 
+                                  FontSize="48" FontFamily="Segoe MDL2 Assets" 
+                                  FontWeight="Light" Glyph="&#xE702;" VerticalAlignment="Top"/>
+
+                        <StackPanel Margin="16,1,0,0">
+                            <TextBlock Width="176" Margin="0,0,0,2" TextWrapping="WrapWholeWords"
+                                       TextTrimming="Clip" Text="{x:Bind DeviceInfo.Name}"/>
+                            <TextBlock Width="176" Height="auto" Style="{ThemeResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                       TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
+                                       Text="{x:Bind DeviceInfo.Id}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+            
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid MaximumRowsOrColumns="4" Orientation="Horizontal" 
+                                   HorizontalAlignment="Left" VerticalAlignment="Top"
+                                   Margin="5, 5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+
+        </GridView>
+        <Button Content="Refresh" HorizontalAlignment="Right" 
+                Margin="10, 10" VerticalAlignment="Bottom" 
+                Width="110" Height="30" Click="RefreshItem_Click" 
+                HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+    </Grid>
+        
+</Page>
