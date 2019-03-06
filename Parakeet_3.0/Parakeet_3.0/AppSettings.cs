@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Networking;
+using Windows.Networking.Connectivity;
 using Windows.Storage;
 using Windows.UI.Xaml.Controls;
 
@@ -17,13 +19,19 @@ namespace Parakeet_3._0 {
         static readonly string debugMode = "debug mode";
         static readonly string tcpPort = "tcp port";
         static readonly string serverHost = "server host";
-        
+
         #endregion
 
-        #region app settings
+        #region default settings values
 
-        // something
-        public int i;
+        public readonly string defaultPort = "13000";           // default port for TCP 
+        public readonly string defaultHost = "localhost";       // default host name for TCP 
+        public readonly bool defaultDebugMode = false;          // default debug mode value
+
+        #endregion
+
+
+        #region app settings management
 
         // debug mode option
         public bool DebugMode {
@@ -68,16 +76,20 @@ namespace Parakeet_3._0 {
                 string hostName = AppLocalSettings.Values[serverHost] as string;
                 // check if the option exists. If not create and returns it
                 if (String.IsNullOrWhiteSpace(hostName)) {
-                    ServerHostName = defaultHost;
+                        var hostNames = NetworkInformation.GetHostNames();
+                    ServerHostName = hostNames.FirstOrDefault(name => name.Type == HostNameType.DomainName)?.DisplayName ?? defaultHost;
                     return defaultHost;
                 } else {
                     return hostName;
                 }
             }
-        }                       
-
-        public readonly string defaultPort = "13000";           // default port for TCP 
-        public readonly string defaultHost = "localhost";       // default host name for TCP 
+        }   
+        
+        public void ResetSettings() {
+            ServerHostName = defaultHost;
+            ServerTCPPort = defaultPort;
+            DebugMode = defaultDebugMode;
+        }
 
         #endregion
 

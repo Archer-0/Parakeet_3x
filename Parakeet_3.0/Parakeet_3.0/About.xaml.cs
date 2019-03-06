@@ -14,8 +14,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-// Il modello di elemento Pagina vuota è documentato all'indirizzo https://go.microsoft.com/fwlink/?LinkId=234238
-
 namespace Parakeet_3._0 {
     /// <summary>
     /// Pagina vuota che può essere usata autonomamente oppure per l'esplorazione all'interno di un frame.

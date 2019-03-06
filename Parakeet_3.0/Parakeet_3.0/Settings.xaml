@@ -40,18 +40,21 @@
                 
             </GridViewItem>
 
-            <!--<StackPanel Name="TCPPortOptionSectio" Orientation="Vertical" Margin="0" 
+            <GridViewItem HorizontalContentAlignment="Left">
+                
+                <StackPanel Name="TCPHostNameOptionSection" Orientation="Vertical"
                         VerticalAlignment="Top" HorizontalAlignment="Left">
 
-                <TextBlock HorizontalAlignment="Left" Text="TCP address" 
-                            TextWrapping="Wrap" VerticalAlignment="Center" Width="auto"/>
+                    <TextBlock HorizontalAlignment="Left" Text="TCP address" 
+                                TextWrapping="Wrap" VerticalAlignment="Center" Width="auto"/>
 
-                <TextBox Name="TCPPortOptionTex" HorizontalAlignment="Left" Margin="0,10,0,0" 
-                            Text="" VerticalAlignment="Top" Width="200" 
-                            PlaceholderText="default: localhost"
-                            ToolTipService.ToolTip="The TCP address for comunication"/>
+                    <TextBox Name="TCPHostNameOptionText" HorizontalAlignment="Left" Margin="0,5,0,0" 
+                                Text="" VerticalAlignment="Top" Width="200" 
+                                PlaceholderText="default: localhost"
+                                ToolTipService.ToolTip="The TCP address for comunication"/>
 
-            </StackPanel>-->
+                </StackPanel>
+            </GridViewItem>
 
             <GridViewItem HorizontalContentAlignment="Left">
                 

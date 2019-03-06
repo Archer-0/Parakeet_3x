@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using MiBand2SDK;
+using Microsoft.Toolkit.Uwp.Notifications;
 using Parakeet_3._0.Models;
 using Windows.ApplicationModel.Background;
 using Windows.ApplicationModel.Core;
@@ -18,9 +21,11 @@ using Windows.Networking;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 using Windows.UI.Core;
+using Windows.UI.Notifications;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace Parakeet_3._0 {
@@ -54,7 +59,7 @@ namespace Parakeet_3._0 {
 
         private bool IsMiBand2 { get; set; } = false;        // check if the device is a mi band (requires a special treatment)
 
-        DispatcherTimer hrTimerController;                  // timer for mi band HR timeout (workaround for a porblem with mi band connection)
+        DispatcherTimer HrTimerController { get; set; } = null;                  // timer for mi band HR timeout (workaround for a porblem with mi band connection)
         DateTimeOffset startTime;                           // when the timer started
         DateTimeOffset lastTime;                            // last check time
 
@@ -91,6 +96,8 @@ namespace Parakeet_3._0 {
 
                 AddLog("Application started. initializing.", AppLog.LogCategory.Debug);
                 SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
+
+                BPMValue = "0";
 
                 Initialize();
             }
@@ -149,6 +156,7 @@ namespace Parakeet_3._0 {
             await GetBluetoothDevice();     // get the bluetooth adapter and set the public variable
             InitializeUIComponents();       // set UI components
             await CheckBluetoothStatus(true);     // check bluetooth status and if off, try to turn it on
+            
             //AddBluetoothStateEventListener();       // adds a eventlistener to the bluetooth state
         }
 
@@ -184,6 +192,7 @@ namespace Parakeet_3._0 {
 
         #region UI Elements Functions
 
+        delegate void DelegateFunc();
         // initialize home interface components
         private void InitializeUIComponents() {
             // set infotext 
@@ -198,9 +207,10 @@ namespace Parakeet_3._0 {
 
             // set hiper link button text
             this.DevicesPageLink.Content = "Select device to start";
-
+            BPMText.Visibility = Visibility.Collapsed;
             this.MiBand2DebugMenu.Visibility = Visibility.Collapsed;        // debug menu for mi band 2
         }
+
 
         // manage the behavior connect button 
         private void ConnectButton_Click(object sender, RoutedEventArgs e) {
@@ -214,6 +224,8 @@ namespace Parakeet_3._0 {
                     ConnectMiBand();
                 else
                     ConnectGenericDevice();
+
+                BPMText.Visibility = Visibility.Visible;
 
             } else {
                 AddLog("No device selected. Select a device from the list in Devices Page", AppLog.LogCategory.Warning);
@@ -295,7 +307,6 @@ namespace Parakeet_3._0 {
             }
         }
 
-
         private async Task CheckBluetoothStatus(bool activateIfOff) {
 
             if (bluetoothRadio != null && bluetoothRadio.State != RadioState.On) {
@@ -342,7 +353,6 @@ namespace Parakeet_3._0 {
             }
 
         }
-
 
         // don't know why but this is being triggered twice every events
         private async void Bluetooth_StateChanged(Radio sender, object args) {
@@ -437,17 +447,6 @@ namespace Parakeet_3._0 {
 
         private async Task DisconnectDevice() {
 
-            //AppRestartFailureReason message = await CoreApplication.RequestRestartAsync("Relaunch requested");
-
-            //if (message == AppRestartFailureReason.NotInForeground ||
-            //    message == AppRestartFailureReason.RestartPending ||
-            //    message == AppRestartFailureReason.Other) {
-
-            //    var dialog = new MessageDialog("Reset failed", message.ToString());
-            //    await dialog.ShowAsync();
-            //}
-            //return;
-
             if (ChosenDevice != null) {
 
                 DeviceInformation delDev = ChosenDevice;
@@ -457,7 +456,7 @@ namespace Parakeet_3._0 {
 
                     if (miBand.IsConnected()) {
                         try {
-                            await miBand.HeartRate.SubscribeToHeartRateNotificationsAsync(null);
+                            await miBand.HeartRate.UnsubscribeFromHeartRateNotificationsAsync(MiBandHRValueChanged);
                             await miBand.HeartRate.SetRealtimeHeartRateMeasurement(MiBand2SDK.Enums.RealtimeHeartRateMeasurements.DISABLE);
                         } catch {
                             AddLog($"Device not connected.", AppLog.LogCategory.Debug);
@@ -466,8 +465,6 @@ namespace Parakeet_3._0 {
 
                     miBand = null;
                     IsMiBand2 = false;
-
-                    // kill background read process eventually
 
                 } else {
                     AddLog($"Disconnectiong from {ChosenDevice.Name}...", AppLog.LogCategory.Info);
@@ -481,6 +478,9 @@ namespace Parakeet_3._0 {
                         AddLog("Device comunication problem. Can't send disconnect signal.", AppLog.LogCategory.Debug);
                     }
                 }
+
+                DispatcherTimer.Stop();
+                HrTimerController.Stop();
 
                 ChosenDevice = null;
                 InitializeUIComponents();
@@ -496,9 +496,9 @@ namespace Parakeet_3._0 {
 
             string message = "Please, remember that the Mi Band 2 support is still in development. We are not responable for any damage.\nUse this software at your own risk!";
             ContentDialog betaDialog = new ContentDialog {
-                Title = "Mi Band 2 support",
+                Title = "Mi Band 2 beta support.",
                 Content = message,
-                CloseButtonText = "Roger",
+                CloseButtonText = "Got it",
             };
 
             await betaDialog.ShowAsync();
@@ -529,17 +529,45 @@ namespace Parakeet_3._0 {
 
                 await MiBandVibrate();        // notify to user that the mi band is connected
 
-                //AddLog($"[1]Connection status: {await miBand.ConnectAsync()}" +
-                //     $"\nAuth status: {miBand.Identity.IsAuthenticated()}", AppLog.LogCategory.Debug);
+                DeviceConnected = true;     // change connection status
+                DispatcherTimerSetup();
+
                 await MiBandGetHRMeasurementRealTime();
 
-                // begin
+                UpdateBPMTextThread();
+
                 SwitchConnectButtonToDisconnectButton();
 
             } else {
                 AddLog($"Unable to connect to {ChosenDevice.Name}." +
                     $"\nVerify if it's nearby and it's turned on.", AppLog.LogCategory.Warning);
             }
+        }
+
+        private async void UpdateBPMTextThread () {
+            await Task.Factory.StartNew(async () => {
+
+                // horrible method, but works for now
+                while (true) {
+
+                    BPMValue = miBand.HeartRate.LastHeartRate.ToString();
+
+                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
+                    CoreDispatcherPriority.High, () => {
+                        //Home.GetCurrent().AddLog($"BPM: {miBand.HeartRate.LastHeartRate}", Models.AppLog.LogCategory.Info);
+                        if (Home.GetCurrent().CurrentBPMText.Visibility != Visibility.Visible) {
+                            Home.GetCurrent().CurrentBPMText.Visibility = Visibility.Visible;
+                        }
+
+                        // set bpm value to share via tcp connections
+                        Home.GetCurrent().CurrentBPMText.Text = $"{BPMValue} BPM";
+                        //Home.GetCurrent().CurrentBPMText.Text = $"{miBand.HeartRate.LastHeartRate} BPM";
+                        //Home.GetCurrent().BPMValue = $"{miBand.HeartRate.LastHeartRate}"; 
+                    });
+
+                    Thread.Sleep(1000);
+                }
+            });
         }
 
         private async Task MiBandVibrate() {
@@ -555,33 +583,25 @@ namespace Parakeet_3._0 {
                 //return;
             }
 
-            //await miBand.HeartRate.SubscribeToHeartRateNotificationsAsync(MiBandHRValueChanged);
-
             int currentHeartRate = args.CharacteristicValue.ToArray()[1];
             lastTime = DateTimeOffset.Now;
-            //System.Diagnostics.Debug.WriteLine($"Current heartrate from background task is {currentHeartRate} bpm ");
-
-            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
-                CoreDispatcherPriority.High, () => {
-                    //Home.GetCurrent().AddLog($"BPM: {miBand.HeartRate.LastHeartRate}", Models.AppLog.LogCategory.Info);
-                    if (Home.GetCurrent().CurrentBPMText.Visibility != Visibility.Visible) {
-                        Home.GetCurrent().CurrentBPMText.Visibility = Visibility.Visible;
-                    }
-
-                    Home.GetCurrent().CurrentBPMText.Text = $"{miBand.HeartRate.LastHeartRate} BPM";
-                });
         }
 
         private async void HrTimerController_Tick(object sender, object e) {
             var span = DateTimeOffset.Now - lastTime;
             if (span > new TimeSpan(0, 0, 5)) {
                 try {
-                    await miBand.HeartRate.SetRealtimeHeartRateMeasurement(MiBand2SDK.Enums.RealtimeHeartRateMeasurements.ENABLE);
+                    //await miBand.HeartRate.UnsubscribeFromHeartRateNotificationsAsync(MiBandHRValueChanged);
+                    //await miBand.HeartRate.SubscribeToHeartRateNotificationsAsync(MiBandHRValueChanged);
+                    //await miBand.HeartRate.SetRealtimeHeartRateMeasurement(MiBand2SDK.Enums.RealtimeHeartRateMeasurements.ENABLE);
                     await miBand.HeartRate.GetHeartRateAsync();
                     lastTime = DateTimeOffset.Now;
-                } catch {
+
+                } catch(Exception ex) {
+                    AddLog($"Exception while resetting hr timer. {ex.StackTrace}", AppLog.LogCategory.Debug);
                     return;
                 }
+                //AddLog($"HR Time Out. Resetting...", AppLog.LogCategory.Debug);
                 Debug.WriteLine("HR Time Out. Resetting");
             }
         }
@@ -603,46 +623,24 @@ namespace Parakeet_3._0 {
                     //await miBand.HeartRate.GetHeartRateAsync();
                     
                     // setting up timer for HR measurements timeout
-                    hrTimerController = new DispatcherTimer();
-                    hrTimerController.Tick += HrTimerController_Tick;
-                    hrTimerController.Interval = new TimeSpan(0, 0, 0, 0, 500);
+                    HrTimerController = new DispatcherTimer();
+                    HrTimerController.Tick += HrTimerController_Tick;
+                    HrTimerController.Interval = new TimeSpan(0, 0, 0, 0, 500);
 
                     startTime = DateTimeOffset.Now;
                     lastTime = startTime;
-                    hrTimerController.Start();
-
+                    //HrTimerController.Start();
                     await Task.Run(async () => {
                         await miBand.HeartRate.SubscribeToHeartRateNotificationsAsync(MiBandHRValueChanged);
                     });
 
+                    // loop for the measurements
+                    await Task.Factory.StartNew(async () => {
+                        await miBand.HeartRate.GetHeartRateAsync();
+                    });
+
                 }
-
-                //await Task.Run(async () => await miBand.HeartRate.SubscribeToHeartRateNotificationsAsync(async (sender, args) => {
-
-                //    //await miBand.HeartRate.SetRealtimeHeartRateMeasurement(MiBand2SDK.Enums.RealtimeHeartRateMeasurements.ENABLE);
-                //    await miBand.HeartRate.SubscribeToHeartRateNotificationsAsync(MiBandHRValueChanged);
-
-                //    int currentHeartRate = args.CharacteristicValue.ToArray()[1];
-                //    //System.Diagnostics.Debug.WriteLine($"Current heartrate from background task is {currentHeartRate} bpm ");
-
-                //    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
-                //        CoreDispatcherPriority.High, () => {
-                //            Home.GetCurrent().AddLog($"BPM: {currentHeartRate}", Models.AppLog.LogCategory.Info);
-                //        });
-                //}));
-
             }
-
-            //RegisterAndRunAsync(ChosenDevice);
-
-            /// TODO: Migrate from out of app back ground process to in-app 
-
-            //await miBand.HeartRate.SubscribeToHeartRateNotificationsAsync(
-            //    (sender, args) => {
-            //        int HRRate = args.CharacteristicValue.ToArray()[1];
-            //        Debug.WriteLine($"BPM: {HRRate}");
-            //        //Home.GetCurrent().AddLog($"BPM: {HRRate}", AppLog.LogCategory.Info);
-            //    }); 
         }
 
         private async void ReadSession_Revoked(object sender, ExtendedExecutionForegroundRevokedEventArgs args) {
@@ -822,7 +820,12 @@ namespace Parakeet_3._0 {
         private async void PingDevice() {
             GattCommunicationStatus status = GattCommunicationStatus.ProtocolError;
             // repeat the notify request
-            status = await HRReaderCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
+            if (IsMiBand2) {
+                status = await miBand.HeartRate.SetRealtimeHeartRateMeasurement(MiBand2SDK.Enums.RealtimeHeartRateMeasurements.ENABLE);
+                
+            } else {
+                status = await HRReaderCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
+            }
 
             if (status == GattCommunicationStatus.Success) {
                 if (DeviceConnected == false) {
@@ -843,52 +846,78 @@ namespace Parakeet_3._0 {
 
         private async void ConnectToServer(HostName hostname, string port) {
             if (!ServerConnected) {
-                AddLog($"Creating remote connection [host: {hostname.RawName}, port: {port}]", AppLog.LogCategory.Debug);
-                try {
+                //AddLog($"Creating connection [host: {hostname.RawName}, port: {port}]", AppLog.LogCategory.Debug);
+
+                this.ServerStatusSquare.Fill = new SolidColorBrush(Windows.UI.Colors.Yellow);
+                this.ServerStatusText.Text = $"Connecting to server...";
+
+                if (StreamSocket == null)
                     StreamSocket = new StreamSocket();
-                    await StreamSocket.ConnectAsync(hostname, port);
+
+                try {
+                    await StreamSocket.ConnectAsync(hostname, port.ToString());
                     ServerConnected = true;
-                    AddLog($"Connected [key: {StreamSocket.Information.SessionKey}]", AppLog.LogCategory.Debug);
+                    this.ServerStatusSquare.Fill = new SolidColorBrush(Windows.UI.Colors.Green);
+                    this.ServerStatusText.Text = $"Connected to server.";
+                    //AddLog($"Connected [key: {StreamSocket.Information.SessionKey}]", AppLog.LogCategory.Debug);
 
                 } catch (Exception e) {
-                    AddLog("Problem while connecting to server.\n" +
-                        "StackTrace: \n" + e.StackTrace, AppLog.LogCategory.Debug);
+                    //AddLog("Problem while connecting to server.\n" +
+                    //    "Message: " + e.Message +
+                    //    "StackTrace: \n" + e.StackTrace, AppLog.LogCategory.Debug);
                     ServerConnected = false;
                 }
             }
         }
 
+        private void DisconnectFromServer() {
+            if (ServerConnected) {
+                AddLog($"Disconnecting from server...", AppLog.LogCategory.Debug);
+                try {
+                    StreamSocket.Dispose();
+
+                } catch (Exception e){
+                    AddLog($"ERROR while disconnecting. \n\tMessage:{e.Message}\n\tStackTrace: {e.StackTrace}", AppLog.LogCategory.Debug);
+                }
+                ServerConnected = false;
+                AddLog($"Server disconnected.", AppLog.LogCategory.Debug);
+            }
+        }
+
         // returns a default value if the port value set by the user is not valid
         string CheckServerPort() {
-            if (Int32.TryParse(appSettings.ServerTCPPort, out int tmp)) {
-                return ServerPort;
+            int result;
+            if (Int32.TryParse(appSettings.ServerTCPPort, out result)) {
+                return appSettings.ServerTCPPort;
             } else {
                 return appSettings.defaultPort;
             }
         }
 
-        //timer setup (suggested tick rate is 2 seconds)
+        // timer setup (suggested tick rate is 2 seconds)
         private void DispatcherTimerSetup() {
             if (DispatcherTimer == null) {
                 DispatcherTimer = new DispatcherTimer();            
             }
 
+            DispatcherTimer.Tick -= DispatcherTimer_Tick;           // remove a function from being called
             DispatcherTimer.Tick += DispatcherTimer_Tick;           // set a function to be called
-            DispatcherTimer.Interval = new TimeSpan(0, 0, 2);       // every 2 seconds
+            DispatcherTimer.Interval = new TimeSpan(0, 0, 1);       // every second send to 
             DispatcherTimer.Start();                                // and start it
         }
 
-        // every tot seconds ping the device to check if it's still nearby and try to reconnect. DO NOT work with mi band 2
+        // every second send the message to tcp listeners
         private void DispatcherTimer_Tick(object sender, object e) {
-            PingDevice();       // ping bluetooth device to verify if it's still nearby
+            // for tcp connection test purposes only
+            if (DeviceConnected)
+                PingDevice();       // ping bluetooth device to verify if it's still nearby
 
             if (!ServerConnected) {
-                if (ServerHost == null) {
-                    ServerHost = new HostName(appSettings.ServerHostName);
-                }
+                ServerHost = new HostName(appSettings.ServerHostName.ToString());
                 ConnectToServer(ServerHost, CheckServerPort());
+            } else {
+                SendToClients(BPMValue);
             }
-            SendToClients(BPMValue);
         }
 
         // sends a message to clients connected to the server
@@ -907,8 +936,23 @@ namespace Parakeet_3._0 {
 
         #endregion
 
-        private void ResetButton_Click(object sender, RoutedEventArgs e) {
+        bool testingServer = false;
 
+        private async void ResetButton_Click(object sender, RoutedEventArgs e) {
+
+            if (testingServer == false) {
+                DispatcherTimerSetup();
+                testingServer = true;
+                ResetButton.Content = "End TCP Connection Test";
+
+                AddLog($"Starting server connection protocol.", AppLog.LogCategory.Debug);
+            } else {
+                DispatcherTimer.Stop();
+                testingServer = false;
+                ResetButton.Content = "Start TCP Connection Test";
+
+                AddLog($"Stopping server connection protocol.", AppLog.LogCategory.Debug);
+            }
         }
     }
 }

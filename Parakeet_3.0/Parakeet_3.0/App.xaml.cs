@@ -66,8 +66,6 @@ namespace Parakeet_3._0 {
 
                 // Posizionare il frame nella finestra corrente
                 Window.Current.Content = rootFrame;
-
-                SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
             }
 
             if (e.PrelaunchActivated == false) {
@@ -77,11 +75,11 @@ namespace Parakeet_3._0 {
                     // parametro
                     rootFrame.Navigate(typeof(MainPage), e.Arguments);
                 }
+
                 // Assicurarsi che la finestra corrente sia attiva
                 Window.Current.Activate();
-
             }
-           
+            
             // extend acrylic
             this.ExtendAcrylicIntoTitleBar();
         }
@@ -108,6 +106,22 @@ namespace Parakeet_3._0 {
             deferral.Complete();
         }
 
+        protected override void OnActivated(IActivatedEventArgs args) {
+            switch (args.Kind) {
+                case ActivationKind.Launch:
+
+                    Frame rootFrame = Window.Current.Content as Frame;
+                    if (rootFrame == null) {
+                        rootFrame = new Frame();
+                        Window.Current.Content = rootFrame;
+                    }
+
+                    rootFrame.Navigate(typeof(MainPage), args);
+                    Window.Current.Activate();
+                    break;
+            }
+        }
+
         // For the fluent design in the whole window
         private void ExtendAcrylicIntoTitleBar() {
             CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
@@ -115,11 +129,5 @@ namespace Parakeet_3._0 {
             titleBar.ButtonBackgroundColor = Colors.Transparent;
             titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
         }
-
-        //protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args) {
-        //    base.OnBackgroundActivated(args);
-        //    IBackgroundTaskInstance taskInstance = args.TaskInstance;
-
-        //}
     }
 }

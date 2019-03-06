@@ -23,7 +23,7 @@
                     <TextBlock Name="AppVersionText" Text="Version: 3.6.996" Style="{StaticResource CaptionTextBlockStyle}"
                        HorizontalAlignment="Right" FontWeight="Light"/>
 
-                    <TextBlock Text="Welcome to Parakeet 3.0" 
+                    <TextBlock Text="Welcome to Parakeet 3" 
                                Style="{ThemeResource SubheaderTextBlockStyle}" FontWeight="Light"
                                VerticalAlignment="Center"/>
 
@@ -32,14 +32,25 @@
             </StackPanel>
 
             <TextBlock TextWrapping="WrapWholeWords" Padding="30, 10, 30, 5" FontWeight="ExtraLight">
-                <Span xml:space="default">
+                <Span xml:space="default" FontFamily="OCR A Std" FontSize="10" FontWeight="Light">
                     The Parakeet project is a open source software, born togheter with a graduation thesys project.
                     <LineBreak/>
-                    <LineBreak/>A huge thank to
-                    <Hyperlink NavigateUri="https://github.com/AL3X1">AL3X1</Hyperlink> is a must for the useful
-                    <Hyperlink NavigateUri="https://github.com/AL3X1/Mi-Band-2-SDK">Mi Band 2 SDK</Hyperlink>.
                     <LineBreak/>
-                    <LineBreak/>Check the source code of Parakeet on <Hyperlink NavigateUri="http://www.github.com/" Foreground="Cyan">GitHub</Hyperlink>.
+                    <Bold>3rd party API used in this project:</Bold>
+                    <LineBreak/> -
+                    <Hyperlink NavigateUri="https://github.com/AL3X1/Mi-Band-2-SDK" Foreground="Cyan">Mi Band 2 SDK</Hyperlink> by
+                    <Hyperlink NavigateUri="https://github.com/AL3X1" Foreground="Cyan">AL3X1</Hyperlink>;
+                    <LineBreak/> - All the libraries the API provided by Microsoft;
+                    <LineBreak/>
+                    <LineBreak/>Credits to :
+                    <LineBreak/> -
+                    <Hyperlink NavigateUri="http://www.github.com/a55mage" Foreground="Red">a55mage</Hyperlink>
+                    <LineBreak/> -
+                    <Hyperlink NavigateUri="http://www.github.com/Archer-0" Foreground="LightGreen">Archer-0</Hyperlink>
+                    <LineBreak/>
+                    <LineBreak/>Check the source code of Parakeet 3.X on <Hyperlink NavigateUri="http://www.github.com/" Foreground="Cyan" FontWeight="Bold">GitHub</Hyperlink>.
+
+
                 </Span>
             </TextBlock>
         </StackPanel>

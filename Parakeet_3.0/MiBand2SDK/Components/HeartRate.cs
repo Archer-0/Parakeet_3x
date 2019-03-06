@@ -41,6 +41,34 @@ namespace MiBand2SDK.Components
                 _heartRateMeasurementCharacteristic.ValueChanged += HeartRateMeasurementCharacteristicValueChanged;
         }
 
+        /// MODIFIED BY ARCHER
+        /// 
+        /// <summary>
+        /// Unsubscribe from HeartRate notifications from band
+        /// </summary>
+        /// <returns></returns>
+        public async Task UnsubscribeFromHeartRateNotificationsAsync() {
+            _heartRateMeasurementCharacteristic = await Gatt.GetCharacteristicByServiceUuid(HEART_RATE_SERVICE, HEART_RATE_MEASUREMENT_CHARACTERISTIC);
+
+            Debug.WriteLine("Unsubscribe from HeartRate notifications from band...");
+            if (await _heartRateMeasurementCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None) == GattCommunicationStatus.Success)
+                _heartRateMeasurementCharacteristic.ValueChanged -= HeartRateMeasurementCharacteristicValueChanged;
+        }
+
+        /// <summary>
+        /// Unsubscribe from HeartRate notifications from band
+        /// </summary>
+        /// <returns></returns>
+        public async Task UnsubscribeFromHeartRateNotificationsAsync(TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs> eventHandler) {
+            _heartRateMeasurementCharacteristic = await Gatt.GetCharacteristicByServiceUuid(HEART_RATE_SERVICE, HEART_RATE_MEASUREMENT_CHARACTERISTIC);
+
+            Debug.WriteLine("Unsubscribe from HeartRate notifications from band...");
+            if (await _heartRateMeasurementCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None) == GattCommunicationStatus.Success)
+                _heartRateMeasurementCharacteristic.ValueChanged -= eventHandler;
+        }
+
+        /// END MODIFIED BY ARCHER
+
         /// <summary>
         /// Subscribe to HeartRate notifications from band.
         /// </summary>

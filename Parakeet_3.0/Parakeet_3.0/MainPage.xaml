@@ -19,7 +19,8 @@
                         CompactModeThresholdWidth="640"
                         ExpandedModeThresholdWidth="1100"
                         SelectionChanged="MainContent_SelectionChanged" 
-                        IsPaneOpen="false">
+                        IsPaneOpen="false"
+                        Header="Parakeet">
 
             <NavigationView.MenuItems>
                 <NavigationViewItem Content="Home" Tag="home"

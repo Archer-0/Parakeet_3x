@@ -26,21 +26,12 @@ namespace Parakeet_3._0 {
         ApplicationSettings appSettings;
 
         public Settings() {
-
-
             this.InitializeComponent();
 
             appSettings = ApplicationSettings.GetInstance;
 
             // restore settings
             LoadSettings();
-
-            DebugOptionCheckBox.Checked += OnAnySettingChanged;
-            DebugOptionCheckBox.Unchecked += OnAnySettingChanged;
-            TCPPortOptionText.TextChanged += OnAnySettingChanged;
-
-            SettingsSaveButton.Content = "Save";
-            SettingsSaveButton.IsEnabled = false;
         }
 
         private void OnAnySettingChanged(object sender, RoutedEventArgs e) {
@@ -64,6 +55,10 @@ namespace Parakeet_3._0 {
                 appSettings.ServerTCPPort = TCPPortOptionText.Text;
             }
 
+            if (TCPHostNameOptionText.Text != "") {
+                appSettings.ServerHostName = TCPHostNameOptionText.Text;
+            }
+
             Home.GetCurrent().AddLog("Settings saved.", Models.AppLog.LogCategory.Debug);
         }
 
@@ -71,7 +66,25 @@ namespace Parakeet_3._0 {
             // from save file
             DebugOptionCheckBox.IsChecked = appSettings.DebugMode;
             TCPPortOptionText.Text = appSettings.ServerTCPPort;
-            
+            TCPHostNameOptionText.Text = appSettings.ServerHostName;
+
+            SetListeners();
+            SettingsSaveButton.Content = "Save";
+            SettingsSaveButton.IsEnabled = false;
+        }
+
+        void SetListeners() {
+            DebugOptionCheckBox.Checked += OnAnySettingChanged;
+            DebugOptionCheckBox.Unchecked += OnAnySettingChanged;
+            TCPPortOptionText.TextChanged += OnAnySettingChanged;
+            TCPHostNameOptionText.TextChanged += OnAnySettingChanged;
+        }
+
+        void ResetSettingsToDefault() {
+            // reset all settings
+            appSettings.ResetSettings();
+            LoadSettings();
+            Home.GetCurrent().AddLog("Settings restored to default.", Models.AppLog.LogCategory.Debug);
         }
 
     }

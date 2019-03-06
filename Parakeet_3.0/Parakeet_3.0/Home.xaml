@@ -86,8 +86,10 @@
 
             <!-- shows the selected device -->
             <TextBlock Name="ConnectStatusText"  Text="Device Connected: None" 
-                       TextWrapping="Wrap" Width="220" Height="auto" MaxHeight="150" FontStyle="Normal" 
-                       FontWeight="ExtraLight" FontSize="24"/>
+                       TextWrapping="Wrap" Width="220" Height="auto" FontStyle="Normal" 
+                       FontWeight="ExtraLight" VerticalAlignment="Top" FontSize="24" 
+                       TextLineBounds="Full" LineStackingStrategy="MaxHeight" MaxLines="4" 
+                       TextTrimming="CharacterEllipsis"/>
 
             <!-- Connection button -->
             <Button Name="ConnectButton" Content="Connect to device" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
@@ -98,8 +100,8 @@
                              Click="DevicesPageHyperlinkButton_Click" Content="TextContent"
                              ToolTipService.ToolTip="Choose a device to connect"/>
             
-            <StackPanel Margin="0, 30, 10, 0" Padding="0, 10" Orientation="Horizontal" 
-                        VerticalAlignment="Stretch" Visibility="Collapsed">
+            <StackPanel Name="BPMText" Margin="0, 30, 10, 0" Padding="0, 10" Orientation="Horizontal" 
+                        VerticalAlignment="Stretch" Visibility="Visible">
                 
                 <FontIcon FontFamily="Segoe MDL2 Assets" FontSize="25" 
                           VerticalAlignment="Center" FontWeight="Light" 
@@ -108,6 +110,19 @@
                 <TextBlock Name="CurrentBPMText" Text="--" FontWeight="Normal" FontSize="20"
                            FontFamily="OCR A Std" TextLineBounds="TrimToBaseline"
                            VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </StackPanel>
+
+            <StackPanel Name="ServerStatus" VerticalAlignment="Center" HorizontalAlignment="Left" 
+                        Orientation="Horizontal" Margin="0, 30, 10, 0">
+                
+                <Rectangle Name="ServerStatusSquare" Height="25" Width="25" HorizontalAlignment="Left" 
+                           Margin="10, 0, 10, 0" Fill="Red"/>
+
+                <TextBlock Name="ServerStatusText" Margin="0, 0, 0, 0" FontFamily="OCR A Std" FontSize="11" 
+                           VerticalAlignment="Center" FontWeight="Light" TextAlignment="Justify">
+                    Server not connected
+                </TextBlock>
+                
             </StackPanel>
 
             <StackPanel Name="MiBand2DebugMenu" Orientation="Vertical" Margin="0, 30, 0, 0" 
@@ -127,9 +142,9 @@
             </StackPanel>
         </StackPanel>
 
-        <Button Name="ResetButton" Content="Reset Parakeet" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
+        <Button Name="ResetButton" Content="Start TCP Connection Test" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
                     Height="auto" Click="ResetButton_Click"
-                    Margin="0, 0, 10, 10" ToolTipService.ToolTip="Click to reset in case of problems"/>
+                    Margin="0, 0, 10, 10"/>
 
     </Grid>
 </Page>
