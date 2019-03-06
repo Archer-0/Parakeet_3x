@@ -48,7 +48,8 @@
                     <LineBreak/> -
                     <Hyperlink NavigateUri="http://www.github.com/Archer-0" Foreground="LightGreen">Archer-0</Hyperlink>
                     <LineBreak/>
-                    <LineBreak/>Check the source code of Parakeet 3.X on <Hyperlink NavigateUri="http://www.github.com/" Foreground="Cyan" FontWeight="Bold">GitHub</Hyperlink>.
+                    <LineBreak/> Check the source code of Parakeet 3.X on
+                    <Hyperlink NavigateUri="https://github.com/Archer-0/Parakeet_3x" Foreground="Cyan" FontWeight="Bold">GitHub</Hyperlink>.
 
 
                 </Span>
