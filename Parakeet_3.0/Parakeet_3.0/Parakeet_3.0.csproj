@@ -150,11 +150,13 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <Content Include="Assets\Fonts\OCR_A_Std_Regular\OCR_A_Std_Regular.ttf" />
     <None Include="Parakeet_3.0_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\Bianco.png" />
     <Content Include="Assets\colorpebble.png" />
+    <Content Include="Assets\Fonts\OCR_A_Std_Regular\readme.html" />
     <Content Include="Assets\LargeTile.scale-100.png" />
     <Content Include="Assets\LargeTile.scale-125.png" />
     <Content Include="Assets\LargeTile.scale-150.png" />

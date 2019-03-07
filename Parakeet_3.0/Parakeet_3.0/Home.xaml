@@ -108,7 +108,8 @@
                           Glyph="&#xE95E;" Margin="10, 0, 20, 0"/>
                 
                 <TextBlock Name="CurrentBPMText" Text="--" FontWeight="Normal" FontSize="20"
-                           FontFamily="OCR A Std" TextLineBounds="TrimToBaseline"
+                           FontFamily="Assets/Fonts/OCR_A_Std_Regular/OCR_A_Std_Regular.ttf#OCR A Std" 
+                           TextLineBounds="TrimToBaseline"
                            VerticalAlignment="Center" HorizontalAlignment="Center"/>
             </StackPanel>
 
@@ -118,8 +119,10 @@
                 <Rectangle Name="ServerStatusSquare" Height="25" Width="25" HorizontalAlignment="Left" 
                            Margin="10, 0, 10, 0" Fill="Red"/>
 
-                <TextBlock Name="ServerStatusText" Margin="0, 0, 0, 0" FontFamily="OCR A Std" FontSize="11" 
-                           VerticalAlignment="Center" FontWeight="Light" TextAlignment="Justify">
+                <TextBlock Name="ServerStatusText" Margin="0, 0, 0, 0" 
+                           FontFamily="Assets/Fonts/OCR_A_Std_Regular/OCR_A_Std_Regular.ttf#OCR A Std" 
+                           FontSize="11" VerticalAlignment="Center" FontWeight="Normal" 
+                           TextAlignment="Justify" FontStyle="Normal">
                     Server not connected
                 </TextBlock>
                 
