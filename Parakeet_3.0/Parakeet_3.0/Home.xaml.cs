@@ -35,17 +35,18 @@ namespace Parakeet_3._0 {
         readonly Guid HRserviceGuid = new Guid("0000180d-0000-1000-8000-00805f9b34fb");             //Heart rate service's GUID
         readonly Guid HRCharacteristicGuid = new Guid("00002A37-0000-1000-8000-00805F9B34FB");      //Heart rate monitor characteristic's GUID
 
-        bool DeviceConnected { get; set; } = false;                         // connection status of the HR device
-        GattDeviceService HRReaderService { get; set; } = null;             // service that provides the HR reader
-        GattCharacteristic HRReaderCharacteristic { get; set; } = null;     // characteristic of the HR reader and HR data
-        DeviceInformation ChosenDevice { get; set; } = null;                // the chosen device for connection
-        BluetoothLEDevice BluetoothDevice { set; get; } = null;             // bluetooth informations of the chosen device
+        bool DeviceConnected { get; set; } = false;                                                 // connection status of the HR device
+        GattDeviceService HRReaderService { get; set; } = null;                                     // service that provides the HR reader
+        GattCharacteristic HRReaderCharacteristic { get; set; } = null;                             // characteristic of the HR reader and HR data
+        DeviceInformation ChosenDevice { get; set; } = null;                                        // the chosen device for connection
+        BluetoothLEDevice BluetoothDevice { set; get; } = null;                                     // bluetooth informations of the chosen device
 
-        private Radio bluetoothRadio = null;                                // link to the bluetooth device of this device
+        private Radio bluetoothRadio = null;                                                        // link to the bluetooth device of this device
 
-        private bool prevBluetoothState = true;
-        private bool isBluetoothEnabled = false;
-        private bool IsBluetoothEnabled {
+        private bool prevBluetoothState = true;                                                     // the previuous bluetooth state
+        private bool isBluetoothEnabled = false;                                                    // curent bluetooth state
+
+        private bool IsBluetoothEnabled {                                                           // setter and getter for the bluetooth state
             get {
                 return this.isBluetoothEnabled;
             }
@@ -57,34 +58,34 @@ namespace Parakeet_3._0 {
 
         }
 
-        private bool IsMiBand2 { get; set; } = false;        // check if the device is a mi band (requires a special treatment)
+        private bool IsMiBand2 { get; set; } = false;                                               // check if the device is a mi band (requires a special treatment)
 
-        DispatcherTimer HrTimerController { get; set; } = null;                  // timer for mi band HR timeout (workaround for a porblem with mi band connection)
-        DateTimeOffset startTime;                           // when the timer started
-        DateTimeOffset lastTime;                            // last check time
+        DispatcherTimer HrTimerController { get; set; } = null;                                     // timer for mi band HR timeout (workaround for a porblem with mi band connection)
+        DateTimeOffset startTime;                                                                   // when the timer started
+        DateTimeOffset lastTime;                                                                    // last check time
 
         DispatcherTimer DispatcherTimer { get; set; } = null;
 
-        Stream InStream { get; set; } = null;                   // TCP server input stream
-        StreamReader InStreamReader { get; set; } = null;       // reader fot input TCP stream
+        Stream InStream { get; set; } = null;                                                       // TCP server input stream
+        StreamReader InStreamReader { get; set; } = null;                                           // reader fot input TCP stream
 
-        MiBand2 miBand = null;                                  // Mi Band device (MIBand2SDK)
-        bool ServerConnected { get; set; } = false;                                 // connection status of the tcp server
-        public string ServerPort { get; set; } = "13000";                           // server port [default: "13000"] (can be changed from settings)
-        StreamSocket StreamSocket { get; set; } = null;                             // TCP client socket to connect to the server
-        public HostName ServerHost { get; set; } = null;       // this host name [default: "localhost"] (can be changed from settings)
+        MiBand2 miBand = null;                                                                      // Mi Band device (MIBand2SDK)
+        bool ServerConnected { get; set; } = false;                                                 // connection status of the tcp server
+        public string ServerPort { get; set; } = "13000";                                           // server port [default: "13000"] (can be changed from settings)
+        StreamSocket StreamSocket { get; set; } = null;                                             // TCP client socket to connect to the server
+        public HostName ServerHost { get; set; } = null;                                            // this host name [default: "localhost"] (can be changed from settings)
 
-        public string BPMValue { get; private set; }        // last bpm value
+        public string BPMValue { get; private set; }                                                // last bpm value
 
-        private static Home thisHome = new Home();      // instance of this class
+        private static Home thisHome = new Home();                                                  // instance of this class
 
-        public ObservableCollection<AppLog> logList;        // list of logs for the loglist in the UI
+        public ObservableCollection<AppLog> logList;                                                // list of logs for the loglist in the UI
 
-        public static MainPage mainPage;        // a reference to the main page class
+        public static MainPage mainPage;                                                            // a reference to the main page class
 
-        bool initialized = false;       // to not initialize this class every time
+        bool initialized = false;                                                                   // to not initialize this class every time
 
-        ApplicationSettings appSettings;
+        ApplicationSettings appSettings;                                                            // reference to the app settings class instance
 
         public Home() {
             if (!initialized) {
@@ -97,7 +98,9 @@ namespace Parakeet_3._0 {
                 AddLog("Application started. initializing.", AppLog.LogCategory.Debug);
                 SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
 
-                BPMValue = "0";
+
+                // this will be -1 until the BLE device start to send values
+                BPMValue = "-1";
 
                 Initialize();
             }
